@@ -1,0 +1,25 @@
+cards:
+  - id: goal-collect
+    category: goal
+    label: Collect and escape
+    value: Collect the artifact then reach goal.
+  - id: mechanic-switch
+    category: mechanic
+    label: Switches
+    value: Use a switch to open the path.
+  - id: enemy-bot
+    category: enemy
+    label: Patrol bot
+    value: One patrol bot guards the goal.
+  - id: constraint-time
+    category: constraint
+    label: Short run
+    value: Finish in under 90 seconds.
+  - id: improve-fair
+    category: improve
+    label: Make fair
+    value: Make enemy pattern more predictable.
+  - id: reflection-why
+    category: reflection
+    label: Explain change
+    value: Describe one improvement you made.

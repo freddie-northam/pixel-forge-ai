@@ -1,0 +1,21 @@
+{
+  "name": "pixelforge-jr",
+  "version": "0.1.0",
+  "private": true,
+  "description": "8-bit AI puzzle builder mini-game for kids",
+  "packageManager": "pnpm@9.15.3",
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev --parallel",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "typecheck": "turbo run typecheck",
+    "format": "prettier --check ."
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.5",
+    "prettier": "^3.5.2",
+    "turbo": "^2.4.4",
+    "typescript": "^5.7.3"
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "missionId": "space-rescue",
+  "version": "1.0.0",
+  "seed": "seed-template",
+  "gridWidth": 20,
+  "gridHeight": 12,
+  "tiles": [
+    { "x": 0, "y": 0, "kind": "wall" },
+    { "x": 1, "y": 0, "kind": "wall" },
+    { "x": 2, "y": 0, "kind": "wall" },
+    { "x": 3, "y": 0, "kind": "wall" },
+    { "x": 4, "y": 0, "kind": "wall" },
+    { "x": 5, "y": 0, "kind": "wall" },
+    { "x": 6, "y": 0, "kind": "wall" },
+    { "x": 7, "y": 0, "kind": "wall" },
+    { "x": 8, "y": 0, "kind": "wall" },
+    { "x": 9, "y": 0, "kind": "wall" },
+    { "x": 10, "y": 0, "kind": "wall" },
+    { "x": 11, "y": 0, "kind": "wall" },
+    { "x": 12, "y": 0, "kind": "wall" },
+    { "x": 13, "y": 0, "kind": "wall" },
+    { "x": 14, "y": 0, "kind": "wall" },
+    { "x": 15, "y": 0, "kind": "wall" },
+    { "x": 16, "y": 0, "kind": "wall" },
+    { "x": 17, "y": 0, "kind": "wall" },
+    { "x": 18, "y": 10, "kind": "goal" },
+    { "x": 19, "y": 0, "kind": "wall" },
+    { "x": 0, "y": 11, "kind": "wall" },
+    { "x": 19, "y": 11, "kind": "wall" }
+  ],
+  "entities": [
+    { "id": "player-1", "type": "player", "x": 1, "y": 1, "behavior": "static" },
+    { "id": "enemy-1", "type": "enemy", "x": 16, "y": 2, "behavior": "patrol" },
+    { "id": "collect-1", "type": "collectible", "x": 10, "y": 6, "behavior": "static" }
+  ],
+  "winCondition": "Collect the star and reach the goal.",
+  "failCondition": "Touching the bot resets to start.",
+  "rationale": "Template level for local mission testing."
+}

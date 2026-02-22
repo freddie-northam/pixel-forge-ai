@@ -1,0 +1,57 @@
+missionPackVersion: 1.0.0
+id: space-rescue
+title: Space Rescue Starter
+description: Build a one-screen rescue puzzle using guided AI prompt cards.
+ageBand: 10-13
+theme: space
+difficulty: starter
+sessionMinutes: 12
+gridWidth: 20
+gridHeight: 12
+maxEnemies: 3
+maxHazards: 8
+objectives:
+  - id: obj-1
+    text: Create one clear win condition.
+    required: true
+  - id: obj-2
+    text: Add one challenge and one hint.
+    required: true
+  - id: obj-3
+    text: Write one reflection sentence.
+    required: false
+promptCards:
+  - id: goal-collect
+    category: goal
+    label: Collect and escape
+    value: Collect the artifact then reach goal.
+    helpText: Start with a simple objective.
+  - id: mechanic-switch
+    category: mechanic
+    label: Switches
+    value: Use a switch to open the path.
+    helpText: Adds a tiny puzzle.
+  - id: enemy-bot
+    category: enemy
+    label: Patrol bot
+    value: One patrol bot guards the goal.
+    helpText: Add one enemy only.
+  - id: constraint-time
+    category: constraint
+    label: Short run
+    value: Finish in under 90 seconds.
+    helpText: Keep challenge focused.
+  - id: improve-fair
+    category: improve
+    label: Make fair
+    value: Make enemy pattern more predictable.
+    helpText: Use for v2 iteration.
+  - id: reflection-why
+    category: reflection
+    label: Explain change
+    value: Describe one improvement you made.
+    helpText: Practice evaluation.
+rubric:
+  clarity: 35
+  fairness: 35
+  fun: 30

@@ -1,0 +1,37 @@
+missionPackVersion: 1.0.0
+id: __SLUG__
+title: New Mission
+description: Create a one-screen puzzle mission for ages 10-13.
+ageBand: 10-13
+theme: custom
+difficulty: starter
+sessionMinutes: 12
+gridWidth: 20
+gridHeight: 12
+maxEnemies: 3
+maxHazards: 8
+objectives:
+  - id: obj-1
+    text: Define a clear win condition.
+    required: true
+promptCards:
+  - id: goal-basic
+    category: goal
+    label: Goal card
+    value: Reach the goal after collecting one item.
+  - id: mechanic-basic
+    category: mechanic
+    label: Mechanic card
+    value: Include one simple switch mechanic.
+  - id: enemy-basic
+    category: enemy
+    label: Enemy card
+    value: Add one predictable enemy.
+  - id: constraint-basic
+    category: constraint
+    label: Constraint card
+    value: Complete in under 90 seconds.
+rubric:
+  clarity: 35
+  fairness: 35
+  fun: 30

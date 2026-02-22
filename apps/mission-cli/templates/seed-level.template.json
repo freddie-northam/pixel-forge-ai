@@ -1,0 +1,12 @@
+{
+  "missionId": "__SLUG__",
+  "version": "1.0.0",
+  "seed": "seed-template",
+  "gridWidth": 20,
+  "gridHeight": 12,
+  "tiles": [{ "x": 18, "y": 10, "kind": "goal" }],
+  "entities": [{ "id": "player-1", "type": "player", "x": 1, "y": 1, "behavior": "static" }],
+  "winCondition": "Reach the goal.",
+  "failCondition": "Touching an enemy resets the player.",
+  "rationale": "Starter template level."
+}
