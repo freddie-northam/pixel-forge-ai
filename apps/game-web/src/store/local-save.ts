@@ -1,28 +1,42 @@
-import type { LevelSpec } from "@pixelforge/shared";
+import { levelSpecSchema, type LevelSpec } from "@pixelforge/shared";
+import { z } from "zod";
 
 const PROFILE_KEY = "pfjr.profile";
-const PROGRESS_KEY = "pfjr.progress";
+const PROGRESS_PREFIX = "pfjr.progress.";
 const LEVEL_DRAFT_KEY = "pfjr.levelDrafts";
 
-interface Profile {
-  id: string;
-  createdAt: string;
-}
+const profileSchema = z.object({
+  id: z.string().min(1),
+  createdAt: z.string().min(1)
+});
 
-interface Progress {
-  missionId: string;
-  completions: number;
-  lastScore: number;
+type Profile = z.infer<typeof profileSchema>;
+
+const progressSchema = z.object({
+  missionId: z.string().min(1),
+  completions: z.number().int().min(0),
+  lastScore: z.number().min(0)
+});
+
+type Progress = z.infer<typeof progressSchema>;
+
+function safeParse<T>(raw: string | null, schema: z.ZodType<T>): T | null {
+  if (!raw) return null;
+  try {
+    return schema.parse(JSON.parse(raw));
+  } catch {
+    return null;
+  }
 }
 
 export function getOrCreateProfile(): Profile {
-  const existing = window.localStorage.getItem(PROFILE_KEY);
+  const existing = safeParse(window.localStorage.getItem(PROFILE_KEY), profileSchema);
   if (existing) {
-    return JSON.parse(existing) as Profile;
+    return existing;
   }
 
   const profile: Profile = {
-    id: `local-${Math.random().toString(36).slice(2, 10)}`,
+    id: crypto.randomUUID(),
     createdAt: new Date().toISOString()
   };
 
@@ -36,21 +50,29 @@ export function saveDraft(level: LevelSpec): void {
 
 export function loadDraft(): LevelSpec | null {
   const raw = window.localStorage.getItem(LEVEL_DRAFT_KEY);
-  return raw ? (JSON.parse(raw) as LevelSpec) : null;
+  if (!raw) return null;
+  try {
+    return levelSpecSchema.parse(JSON.parse(raw));
+  } catch {
+    return null;
+  }
 }
 
 export function updateProgress(missionId: string, score: number): void {
-  const raw = window.localStorage.getItem(PROGRESS_KEY);
-  const current = raw ? (JSON.parse(raw) as Progress) : { missionId, completions: 0, lastScore: 0 };
+  const key = `${PROGRESS_PREFIX}${missionId}`;
+  const current = safeParse(window.localStorage.getItem(key), progressSchema) ?? {
+    missionId,
+    completions: 0,
+    lastScore: 0
+  };
   const next: Progress = {
     missionId,
     completions: current.completions + 1,
     lastScore: score
   };
-  window.localStorage.setItem(PROGRESS_KEY, JSON.stringify(next));
+  window.localStorage.setItem(key, JSON.stringify(next));
 }
 
-export function loadProgress(): Progress | null {
-  const raw = window.localStorage.getItem(PROGRESS_KEY);
-  return raw ? (JSON.parse(raw) as Progress) : null;
+export function loadProgress(missionId: string): Progress | null {
+  return safeParse(window.localStorage.getItem(`${PROGRESS_PREFIX}${missionId}`), progressSchema);
 }

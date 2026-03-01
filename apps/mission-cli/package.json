@@ -21,6 +21,7 @@
     "zod": "^3.24.2"
   },
   "devDependencies": {
+    "@types/archiver": "^6.0.3",
     "@types/js-yaml": "^4.0.9",
     "typescript": "^5.7.3",
     "tsx": "^4.19.3"

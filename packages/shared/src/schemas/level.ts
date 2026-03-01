@@ -11,7 +11,7 @@ export const entitySchema = z.object({
   type: z.enum(["player", "enemy", "collectible"]),
   x: z.number().int().min(0),
   y: z.number().int().min(0),
-  behavior: z.enum(["patrol", "static", "chase"]).optional()
+  behavior: z.enum(["patrol", "static", "chase"]).default("static")
 });
 
 export const levelSpecSchema = z

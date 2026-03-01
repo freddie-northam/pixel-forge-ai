@@ -13,7 +13,8 @@
   },
   "dependencies": {
     "@pixelforge/shared": "workspace:*",
-    "phaser": "^3.90.0"
+    "phaser": "^3.90.0",
+    "zod": "^3.24.2"
   },
   "devDependencies": {
     "typescript": "^5.7.3",

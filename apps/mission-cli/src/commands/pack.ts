@@ -20,7 +20,7 @@ export async function runPack(rootDir: string, slug: string): Promise<void> {
     const archive = archiver("zip", { zlib: { level: 9 } });
 
     output.on("close", () => resolve());
-    archive.on("error", (error) => reject(error));
+    archive.on("error", (error: Error) => reject(error));
 
     archive.pipe(output);
     archive.directory(missionDir, slug);

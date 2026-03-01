@@ -21,6 +21,21 @@ function emitStatus(message: string, kind: "success" | "error" = "success"): voi
   window.dispatchEvent(new CustomEvent("pfjr:status", { detail: { message, kind } }));
 }
 
+function makeCallbacks(
+  missionId: string,
+  winScore: number,
+  winMessage: string,
+  failMessage: string
+): { onWin: () => void; onFail: () => void } {
+  return {
+    onWin: () => {
+      updateProgress(missionId, winScore);
+      emitStatus(winMessage, "success");
+    },
+    onFail: () => emitStatus(failMessage, "error")
+  };
+}
+
 async function loadMission(): Promise<MissionDefinition> {
   const response = await fetch("/missions/space-rescue/mission.json");
   if (!response.ok) {
@@ -75,15 +90,14 @@ async function boot(): Promise<void> {
   const mission = await loadMission();
   let activeLevel = loadDraft() ?? (await loadSeedLevel());
 
-  const runtime = createGame(
-    "game",
-    activeLevel,
-    () => {
-      updateProgress(mission.id, 85);
-      emitStatus("Mission complete! You shipped a playable level.", "success");
-    },
-    () => emitStatus("You were tagged by an enemy. Try an improvement card.", "error")
+  const initial = makeCallbacks(
+    mission.id,
+    85,
+    "Mission complete! You shipped a playable level.",
+    "You were tagged by an enemy. Try an improvement card."
   );
+
+  const runtime = createGame("game", activeLevel, initial.onWin, initial.onFail);
 
   const panel = document.getElementById("panel");
   if (!panel) {
@@ -98,15 +112,14 @@ async function boot(): Promise<void> {
         const parsed = levelSpecSchema.parse(response.level);
         activeLevel = parsed;
         saveDraft(parsed);
-        loadLevelIntoGame(
-          runtime,
-          parsed,
-          () => {
-            updateProgress(mission.id, 85);
-            emitStatus("Mission complete! You shipped a playable level.", "success");
-          },
-          () => emitStatus("You were tagged by an enemy. Try an improvement card.", "error")
+
+        const cb = makeCallbacks(
+          mission.id,
+          85,
+          "Mission complete! You shipped a playable level.",
+          "You were tagged by an enemy. Try an improvement card."
         );
+        loadLevelIntoGame(runtime, parsed, cb.onWin, cb.onFail);
 
         if (response.safety.status === "rewrite") {
           emitStatus(`Safety coach: ${response.safety.reason}`, "error");
@@ -124,15 +137,13 @@ async function boot(): Promise<void> {
         activeLevel = parsed;
         saveDraft(parsed);
 
-        loadLevelIntoGame(
-          runtime,
-          parsed,
-          () => {
-            updateProgress(mission.id, 90);
-            emitStatus("Improved level completed. Great iteration!", "success");
-          },
-          () => emitStatus("Retry with a fairness improvement card.", "error")
+        const cb = makeCallbacks(
+          mission.id,
+          90,
+          "Improved level completed. Great iteration!",
+          "Retry with a fairness improvement card."
         );
+        loadLevelIntoGame(runtime, parsed, cb.onWin, cb.onFail);
 
         if (response.safety.status === "rewrite") {
           emitStatus(`Safety coach adjusted your note: ${response.safety.reason}`, "error");

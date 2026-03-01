@@ -82,17 +82,25 @@ export function generateLevel(input: GenerationInput): LevelSpec {
   return levelSpecSchema.parse(level);
 }
 
-export function improveLevel(level: LevelSpec, improveCards: PromptCard[], note?: string): LevelSpec {
+export function improveLevel(
+  level: LevelSpec,
+  improveCards: PromptCard[],
+  note?: string,
+  maxEnemies?: number
+): LevelSpec {
   const validatedLevel = levelSpecSchema.parse(level);
   const modifiers = improveCards.map((card) => card.value.toLowerCase());
 
   const harder = modifiers.some((value) => value.includes("hard") || value.includes("challenge"));
   const safer = modifiers.some((value) => value.includes("safe") || value.includes("clear"));
 
+  const currentEnemyCount = validatedLevel.entities.filter((e) => e.type === "enemy").length;
+  const canAddEnemy = harder && (maxEnemies === undefined || currentEnemyCount < maxEnemies);
+
   const updated: LevelSpec = {
     ...validatedLevel,
     seed: hashSeed(`${validatedLevel.seed}|${modifiers.join("|")}|${note ?? ""}`),
-    entities: harder
+    entities: canAddEnemy
       ? [
           ...validatedLevel.entities,
           {

@@ -86,7 +86,13 @@ function defaultSeedLevel(slug: string): SeedLevel {
   };
 }
 
+const VALID_SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+
 export async function runCreate(rootDir: string, slug: string): Promise<void> {
+  if (!VALID_SLUG.test(slug)) {
+    throw new Error(`Invalid slug "${slug}". Use only lowercase letters, digits, and hyphens (e.g. "space-rescue").`);
+  }
+
   const missionDir = path.join(rootDir, "missions", slug);
   if (await pathExists(missionDir)) {
     throw new Error(`Mission ${slug} already exists`);

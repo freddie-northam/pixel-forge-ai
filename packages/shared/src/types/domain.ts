@@ -81,11 +81,3 @@ export interface MissionDefinition {
   promptCards: PromptCard[];
   rubric: RubricWeight;
 }
-
-export interface MissionRunResult {
-  missionId: string;
-  levelSeed: string;
-  score: number;
-  rubricBreakdown: RubricWeight;
-  reflectionPrompt: string;
-}

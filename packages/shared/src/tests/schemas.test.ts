@@ -48,3 +48,37 @@ test("levelSpecSchema requires exactly one player", () => {
     });
   });
 });
+
+test("entitySchema defaults behavior to static", () => {
+  const level = levelSpecSchema.parse({
+    missionId: "test",
+    version: "1.0.0",
+    seed: "seed-abc",
+    gridWidth: 20,
+    gridHeight: 12,
+    tiles: [{ x: 18, y: 10, kind: "goal" }],
+    entities: [{ id: "p1", type: "player", x: 1, y: 1 }],
+    winCondition: "Reach goal tile",
+    failCondition: "Touch an enemy",
+    rationale: "Test behavior default"
+  });
+
+  assert.equal(level.entities[0].behavior, "static");
+});
+
+test("levelSpecSchema rejects missing goal tile", () => {
+  assert.throws(() => {
+    levelSpecSchema.parse({
+      missionId: "test",
+      version: "1.0.0",
+      seed: "seed-abc",
+      gridWidth: 20,
+      gridHeight: 12,
+      tiles: [{ x: 0, y: 0, kind: "wall" }],
+      entities: [{ id: "p1", type: "player", x: 1, y: 1 }],
+      winCondition: "Reach goal tile",
+      failCondition: "Touch an enemy",
+      rationale: "No goal tile present"
+    });
+  });
+});

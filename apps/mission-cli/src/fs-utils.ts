@@ -17,7 +17,7 @@ export async function ensureDir(targetPath: string): Promise<void> {
 
 export async function readYaml<T>(filePath: string): Promise<T> {
   const raw = await fs.readFile(filePath, "utf8");
-  return yaml.load(raw) as T;
+  return yaml.load(raw, { schema: yaml.JSON_SCHEMA }) as T;
 }
 
 export async function writeYaml(filePath: string, value: unknown): Promise<void> {

@@ -10,8 +10,12 @@ export function errorHandler(error: unknown, _request: Request, response: Respon
     return;
   }
 
+  // eslint-disable-next-line no-console
+  console.error("[ai-proxy] Unhandled error:", error);
+
+  const isDev = process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test";
   response.status(500).json({
     error: "internal_error",
-    message: error instanceof Error ? error.message : "Unknown error"
+    message: isDev && error instanceof Error ? error.message : "An unexpected error occurred."
   });
 }
