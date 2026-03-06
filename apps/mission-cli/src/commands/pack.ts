@@ -3,9 +3,10 @@ import { createWriteStream } from "node:fs";
 import { promises as fs } from "node:fs";
 import archiver from "archiver";
 import { missionDefinitionSchema } from "@pixelforge/shared";
-import { ensureDir, readYaml } from "../fs-utils.js";
+import { ensureDir, readYaml, validateSlug } from "../fs-utils.js";
 
 export async function runPack(rootDir: string, slug: string): Promise<void> {
+  validateSlug(slug);
   const missionDir = path.join(rootDir, "missions", slug);
   const mission = missionDefinitionSchema.parse(await readYaml(path.join(missionDir, "mission.yaml")));
 

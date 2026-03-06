@@ -5,22 +5,10 @@ import {
   type PromptCard,
   type RubricWeight,
   type TileSpec,
-  type EntitySpec
+  type EntitySpec,
+  type LevelSpec
 } from "@pixelforge/shared";
-import { ensureDir, pathExists, writeYaml } from "../fs-utils.js";
-
-interface SeedLevel {
-  missionId: string;
-  version: string;
-  seed: string;
-  gridWidth: number;
-  gridHeight: number;
-  tiles: TileSpec[];
-  entities: EntitySpec[];
-  winCondition: string;
-  failCondition: string;
-  rationale: string;
-}
+import { ensureDir, pathExists, validateSlug, writeYaml } from "../fs-utils.js";
 
 function starterCards(): PromptCard[] {
   return [
@@ -59,7 +47,7 @@ function defaultMission(slug: string): MissionDefinition {
   };
 }
 
-function defaultSeedLevel(slug: string): SeedLevel {
+function defaultSeedLevel(slug: string): LevelSpec {
   const tiles: TileSpec[] = [
     { x: 0, y: 0, kind: "wall" },
     { x: 1, y: 0, kind: "wall" },
@@ -87,6 +75,7 @@ function defaultSeedLevel(slug: string): SeedLevel {
 }
 
 export async function runCreate(rootDir: string, slug: string): Promise<void> {
+  validateSlug(slug);
   const missionDir = path.join(rootDir, "missions", slug);
   if (await pathExists(missionDir)) {
     throw new Error(`Mission ${slug} already exists`);

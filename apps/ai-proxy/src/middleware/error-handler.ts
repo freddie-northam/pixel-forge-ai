@@ -12,6 +12,6 @@ export function errorHandler(error: unknown, _request: Request, response: Respon
 
   response.status(500).json({
     error: "internal_error",
-    message: error instanceof Error ? error.message : "Unknown error"
+    message: "Something went wrong. Please try again."
   });
 }
