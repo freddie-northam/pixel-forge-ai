@@ -26,6 +26,8 @@ export function createGame(containerId: string, level: LevelSpec, onWin: () => v
 }
 
 export function loadLevelIntoGame(game: Phaser.Game, level: LevelSpec, onWin: () => void, onFail: () => void): void {
+  game.scale.resize(level.gridWidth * TILE, level.gridHeight * TILE);
+
   if (!game.scene.isActive("PlayScene")) {
     game.scene.start("PlayScene", { level, onWin, onFail });
     return;

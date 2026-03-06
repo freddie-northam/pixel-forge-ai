@@ -37,7 +37,12 @@ export function mountPromptPanel(target: HTMLElement, deps: PanelDeps): void {
     cardsWrap.append(button);
   });
 
+  const label = document.createElement("label");
+  label.textContent = "Your idea";
+  label.htmlFor = "prompt-text";
+
   const textArea = document.createElement("textarea");
+  textArea.id = "prompt-text";
   textArea.placeholder = "Optional: add a short idea, e.g. 'robot rescue with safe challenge'";
   textArea.maxLength = 200;
 
@@ -48,6 +53,11 @@ export function mountPromptPanel(target: HTMLElement, deps: PanelDeps): void {
   generateButton.className = "primary";
   generateButton.textContent = "Generate Level";
   generateButton.addEventListener("click", async () => {
+    if (selected.size === 0 && !textArea.value.trim()) {
+      status.textContent = "Please select at least one card or enter an idea.";
+      status.className = "status error";
+      return;
+    }
     status.textContent = "Generating...";
     status.className = "status";
     await deps.onGenerate(Array.from(selected.values()), textArea.value.trim());
@@ -56,6 +66,11 @@ export function mountPromptPanel(target: HTMLElement, deps: PanelDeps): void {
   const improveButton = document.createElement("button");
   improveButton.textContent = "Improve Current Level";
   improveButton.addEventListener("click", async () => {
+    if (selected.size === 0 && !textArea.value.trim()) {
+      status.textContent = "Please select at least one card or enter an idea.";
+      status.className = "status error";
+      return;
+    }
     status.textContent = "Improving...";
     status.className = "status";
     await deps.onImprove(Array.from(selected.values()), textArea.value.trim());
@@ -65,9 +80,10 @@ export function mountPromptPanel(target: HTMLElement, deps: PanelDeps): void {
 
   const status = document.createElement("p");
   status.className = "status";
+  status.setAttribute("aria-live", "polite");
   status.textContent = "Select cards and build your puzzle.";
 
-  target.replaceChildren(title, cardsWrap, textArea, controls, status);
+  target.replaceChildren(title, cardsWrap, label, textArea, controls, status);
 
   const setStatus = (message: string, kind: "success" | "error" = "success") => {
     status.textContent = message;

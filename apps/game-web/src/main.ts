@@ -11,6 +11,7 @@ import { getOrCreateProfile, loadDraft, saveDraft, updateProgress } from "./stor
 import "./styles.css";
 
 const API_BASE = import.meta.env.VITE_AI_PROXY_BASE_URL ?? "http://localhost:4242/v1";
+const API_TIMEOUT_MS = 10_000;
 
 interface GenerateResponse {
   level: LevelSpec;
@@ -40,33 +41,68 @@ async function loadSeedLevel(): Promise<LevelSpec> {
 }
 
 async function postGenerate(mission: MissionDefinition, selectedCards: PromptCard[], freeText: string): Promise<GenerateResponse> {
-  const response = await fetch(`${API_BASE}/generate-level`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ mission, selectedCards, freeText })
-  });
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), API_TIMEOUT_MS);
+  try {
+    const response = await fetch(`${API_BASE}/generate-level`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ mission, selectedCards, freeText }),
+      signal: controller.signal
+    });
 
-  if (!response.ok) {
-    const body = await response.text();
-    throw new Error(`Generate failed: ${body}`);
+    if (!response.ok) {
+      const body = await response.text();
+      throw new Error(`Generate failed: ${body}`);
+    }
+
+    return (await response.json()) as GenerateResponse;
+  } catch (error) {
+    if (error instanceof DOMException && error.name === "AbortError") {
+      throw new Error("Generation request timed out. Please try again.");
+    }
+    throw error;
+  } finally {
+    clearTimeout(timeout);
   }
-
-  return (await response.json()) as GenerateResponse;
 }
 
 async function postImprove(level: LevelSpec, improveCards: PromptCard[], note: string): Promise<GenerateResponse> {
-  const response = await fetch(`${API_BASE}/improve-level`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ level, improveCards, note })
-  });
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), API_TIMEOUT_MS);
+  try {
+    const response = await fetch(`${API_BASE}/improve-level`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ level, improveCards, note }),
+      signal: controller.signal
+    });
 
-  if (!response.ok) {
-    const body = await response.text();
-    throw new Error(`Improve failed: ${body}`);
+    if (!response.ok) {
+      const body = await response.text();
+      throw new Error(`Improve failed: ${body}`);
+    }
+
+    return (await response.json()) as GenerateResponse;
+  } catch (error) {
+    if (error instanceof DOMException && error.name === "AbortError") {
+      throw new Error("Improve request timed out. Please try again.");
+    }
+    throw error;
+  } finally {
+    clearTimeout(timeout);
   }
+}
 
-  return (await response.json()) as GenerateResponse;
+function makeOnWin(missionId: string, score: number, message: string): () => void {
+  return () => {
+    updateProgress(missionId, score);
+    emitStatus(message, "success");
+  };
+}
+
+function makeOnFail(message: string): () => void {
+  return () => emitStatus(message, "error");
 }
 
 async function boot(): Promise<void> {
@@ -78,11 +114,8 @@ async function boot(): Promise<void> {
   const runtime = createGame(
     "game",
     activeLevel,
-    () => {
-      updateProgress(mission.id, 85);
-      emitStatus("Mission complete! You shipped a playable level.", "success");
-    },
-    () => emitStatus("You were tagged by an enemy. Try an improvement card.", "error")
+    makeOnWin(mission.id, 85, "Mission complete! You shipped a playable level."),
+    makeOnFail("You were tagged by an enemy. Try an improvement card.")
   );
 
   const panel = document.getElementById("panel");
@@ -101,11 +134,8 @@ async function boot(): Promise<void> {
         loadLevelIntoGame(
           runtime,
           parsed,
-          () => {
-            updateProgress(mission.id, 85);
-            emitStatus("Mission complete! You shipped a playable level.", "success");
-          },
-          () => emitStatus("You were tagged by an enemy. Try an improvement card.", "error")
+          makeOnWin(mission.id, 85, "Mission complete! You shipped a playable level."),
+          makeOnFail("You were tagged by an enemy. Try an improvement card.")
         );
 
         if (response.safety.status === "rewrite") {
@@ -127,11 +157,8 @@ async function boot(): Promise<void> {
         loadLevelIntoGame(
           runtime,
           parsed,
-          () => {
-            updateProgress(mission.id, 90);
-            emitStatus("Improved level completed. Great iteration!", "success");
-          },
-          () => emitStatus("Retry with a fairness improvement card.", "error")
+          makeOnWin(mission.id, 90, "Improved level completed. Great iteration!"),
+          makeOnFail("Retry with a fairness improvement card.")
         );
 
         if (response.safety.status === "rewrite") {
